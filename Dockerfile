@@ -45,7 +45,8 @@ RUN cd esgmeta \
     && wget https://raw.githubusercontent.com/buildout/buildout/master/bootstrap/bootstrap.py \
     && python bootstrap.py \
     && bin/buildout \
-    && python setup.py install
+    && python setup.py install \
+    && rm -rf .meta_select
 
 # run bootstrap
 #RUN cd /root/esgmeta/esgmeta && python bootstrap.py
