@@ -14,16 +14,12 @@ ENV LD_LIBRARY_PATH=$ORACLE_HOME/lib:$LD_LIBRARY_PATH
 # install or check installation of software
 RUN yum -y install python-devel python-pip
 RUN yum -y install readline-devel openssl-devel zlib-devel glibc-devel bzip2 tar bzip2-devel sqlite-devel
-RUN yum install -y libxml2 libxml2-devel libxslt libxslt-devel
+RUN yum -y install libxml2 libxml2-devel libxslt libxslt-devel
 RUN yum -y install gcc-gfortran gcc44-gfortran libgfortran lapack blas python-devel
 RUN yum -y install postgresql.x86_64 postgresql-devel.x86_64 postgresql-devel
 
 # now update python
-RUN pip install python-termstyle
-RUN pip install cx_Oracle
-RUN pip install numpy
-RUN pip install lxml
-RUN pip install psycopg2
+RUN pip install python-termstyle cx_Oracle numpy lxml psycopg2
 
 # add wget
 RUN yum -y install git wget
@@ -34,24 +30,31 @@ ADD id_rsa.pub /root/.ssh/
 ADD known_hosts /root/.ssh/
 
 RUN rm -rf /root/esgmeta
-RUN mkdir -p /root/esgmeta
+#RUN mkdir -p /root/esgmeta
 
 # checkout branch test (latets version, actual not merged to master)
-RUN cd /root/esgmeta && git clone gitosis@redmine.dkrz.de:esgmeta.git -b test
+#RUN cd /root/esgmeta 
+RUN git clone gitosis@redmine.dkrz.de:esgmeta.git -b test
 
-# update bootstrap
-RUN cd /root/esgmeta/esgmeta \
+# update bootstrap 
+# run bootstrap 
+# run buildout 
+# run setup.py install
+RUN cd esgmeta \
     && rm -f bootstrap.py \
     && wget https://raw.githubusercontent.com/buildout/buildout/master/bootstrap/bootstrap.py \
-    && ls -al
+    && python bootstrap.py \
+    && bin/buildout \
+    && python setup.py install
+
 # run bootstrap
-RUN cd /root/esgmeta/esgmeta && ls -al && python bootstrap.py
+#RUN cd /root/esgmeta/esgmeta && python bootstrap.py
 
 # build binary
-RUN cd /root/esgmeta/esgmeta && ls -al bin && bin/buildout
+#RUN cd /root/esgmeta/esgmeta && bin/buildout
 
 # install binary
-RUN cd /root/esgmeta/esgmeta && python setup.py install
+#RUN cd /root/esgmeta/esgmeta && python setup.py install
 
 # test the binary (should result in an error because the CERA pw is missing)
-RUN /root/esgmeta/esgmeta/bin/esgmeta --help
+#RUN /root/esgmeta/esgmeta/bin/esgmeta --help
